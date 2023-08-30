@@ -38,6 +38,18 @@ writeToLog() {
 	echo -e "${1}" | tee -a "${logFile}"
 }
 
+# Attempt to run a completion script after our backup finishes.
+# Will call $pathToCompleteScript (success|fail)
+do_on_complete_script () {
+
+	# Check that our completion script is present.
+	if [[ -f "${pathToCompleteScript}" ]] && [[ -ne "${pathToCompleteScript}" ]]; then
+		writeToLog "\\n[$(${logDateCmd})] Running completion script."
+		source "${pathToCompleteScript}" "$1"
+	fi
+
+}
+
 writeToLog "********************************"
 writeToLog "*                              *"
 writeToLog "*   rsync-incremental-backup   *"
@@ -160,15 +172,3 @@ then
 fi
 
 exit "${rsyncFail}"
-
-# Attempt to run a completion script after our backup finishes.
-# Will call $pathToCompleteScript (success|fail)
-do_on_complete_script () {
-
-	# Check that our completion script is present.
-	if [[ -f "${pathToCompleteScript}" ]] && [[ -ne "${pathToCompleteScript}" ]]; then
-		writeToLog "\\n[$(${logDateCmd})] Running completion script."
-		source "${pathToCompleteScript}" "$1"
-	fi
-
-}
