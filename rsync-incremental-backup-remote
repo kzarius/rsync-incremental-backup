@@ -71,7 +71,7 @@ do_on_complete_script() {
 	# Check that our completion script is present.
 	if [[ -f "${pathToCompleteScript}" ]] && [[ -ne "${pathToCompleteScript}" ]]; then
 		writeToLog "\\n[$(${logDateCmd})] Running completion script."
-		source "${pathToCompleteScript}" "$1"
+		source "${pathToCompleteScript}" "${1}"
 	fi
 
 }
@@ -120,7 +120,7 @@ then
 	writeToLog "\\n[$(${logDateCmd})] Remote destination is not reachable"
 
 	# See if we need to run a script on completion.
-	do_on_complete_script failed
+	do_on_complete_script "failed"
 
 	exit 1
 fi
@@ -200,7 +200,7 @@ then
 	writeToLog "\\n[$(${logDateCmd})] Backup completed successfully"
 
 	# See if we need to run a script on completion.
-	do_on_complete_script success
+	do_on_complete_script "success"
 
 	# Clear unneeded partials and lock file
 	ssh "${sshParams[@]}" "${remote}" "rm -rf ${partialFolderPath} ${rotationLockFilePath}"
@@ -211,7 +211,7 @@ else
 	writeToLog "\\n[$(${logDateCmd})] Backup failed, try again later"
 
 	# See if we need to run a script on completion.
-	do_on_complete_script failed
+	do_on_complete_script "failed"
 
 	rsyncFail=1
 fi
