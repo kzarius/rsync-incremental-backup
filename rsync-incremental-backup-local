@@ -51,7 +51,7 @@ writeToLog() {
 
 # Attempt to run a completion script after our backup finishes.
 # Will call $pathToCompleteScript (success|fail)
-do_on_complete_script () {
+do_on_complete_script() {
 
 	# Check that our completion script is present.
 	if [[ -f "${pathToCompleteScript}" ]] && [[ -ne "${pathToCompleteScript}" ]]; then
