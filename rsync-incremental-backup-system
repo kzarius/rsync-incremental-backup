@@ -43,7 +43,7 @@ writeToLog() {
 doFinishScript() {
 
 	# Check that our completion script is present.
-	if [ -f "${pathToCompleteScript}" ] && [ -ne "${pathToCompleteScript}" ]; then
+	if [[ -f "${pathToCompleteScript}" ]] && [[ ! -z "${pathToCompleteScript}" ]]; then
 		writeToLog "\\n[$(${logDateCmd})] Running completion script."
 		source "${pathToCompleteScript}" "${1}"
 	fi
