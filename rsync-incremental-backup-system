@@ -12,6 +12,7 @@ rotationLockFileName="${rotationLockFileName:-.rsync-rotation-lock}"
 pathBakN="${pathBakN:-backup}"
 nameBakN="${nameBakN:-backup}"
 exclusionFileName="${exclusionFileName:-exclude.txt}"
+pathToCompleteScript="${pathToCompleteScript:-}"
 logDateCmd="${logDateCmd:-printf %(%FT%T%z)T}"
 logName="${logName:-rsync-incremental-backup_$(printf '%(%F)T')_$(printf '%(%H-%M-%S)T').log}"
 ownFolderName="${ownFolderName:-.rsync-incremental-backup}"
@@ -133,6 +134,9 @@ if [ ${rsyncExitCode} -eq 0 ] || [ ${rsyncExitCode} -eq 24 ]
 then
 	writeToLog "\\n[$(${logDateCmd})] Backup completed successfully"
 
+	# See if we need to run a script on completion.
+	do_on_complete_script success
+
 	# Clear unneeded partials and lock file
 	rm -rf "${rotationLockFilePath}"
 	# Update backup directory modification time
@@ -140,6 +144,10 @@ then
 	rsyncFail=0
 else
 	writeToLog "\\n[$(${logDateCmd})] Backup failed, try again later"
+
+	# See if we need to run a script on completion.
+	do_on_complete_script failed
+
 	rsyncFail=1
 fi
 
@@ -152,3 +160,15 @@ then
 fi
 
 exit "${rsyncFail}"
+
+# Attempt to run a completion script after our backup finishes.
+# Will call $pathToCompleteScript (success|fail)
+do_on_complete_script () {
+
+	# Check that our completion script is present.
+	if [[ -f "${pathToCompleteScript}" ]] && [[ -ne "${pathToCompleteScript}" ]]; then
+		writeToLog "\\n[$(${logDateCmd})] Running completion script."
+		source "${pathToCompleteScript}" "$1"
+	fi
+
+}
