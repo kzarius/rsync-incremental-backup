@@ -40,12 +40,12 @@ writeToLog() {
 
 # Attempt to run a completion script after our backup finishes.
 # Will call $pathToCompleteScript (success|fail)
-do_on_complete_script() {
+doFinishScript() {
 
 	# Check that our completion script is present.
 	if [[ -f "${pathToCompleteScript}" ]] && [[ -ne "${pathToCompleteScript}" ]]; then
 		writeToLog "\\n[$(${logDateCmd})] Running completion script."
-		source "${pathToCompleteScript}" "$1"
+		source "${pathToCompleteScript}" "${1}"
 	fi
 
 }
@@ -147,7 +147,7 @@ then
 	writeToLog "\\n[$(${logDateCmd})] Backup completed successfully"
 
 	# See if we need to run a script on completion.
-	do_on_complete_script success
+	doFinishScript "success"
 
 	# Clear unneeded partials and lock file
 	rm -rf "${rotationLockFilePath}"
@@ -158,7 +158,7 @@ else
 	writeToLog "\\n[$(${logDateCmd})] Backup failed, try again later"
 
 	# See if we need to run a script on completion.
-	do_on_complete_script failed
+	doFinishScript "failed"
 
 	rsyncFail=1
 fi
